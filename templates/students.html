@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+{% block title %}Students — AI Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">Enrolled Students</div>
+        <div class="page-sub">Manage Student Profiles & Face Registrations</div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="openAddStudentModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Add Student
+    </button>
+</div>
+
+<div class="page-body">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">👥 Student Directory</div>
+            <span class="badge badge-blue" style="margin-left: 12px;">{{ students | length }} students</span>
+        </div>
+        <div class="table-wrap">
+            {% if students %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student Info</th>
+                        <th>Contact</th>
+                        <th>Course</th>
+                        <th>Face Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in students %}
+                    <tr id="student-row-{{ s.student_id }}">
+                        <td>
+                            <div style="display:flex; align-items:center; gap:14px;">
+                                {% if s.face_image_path %}
+                                <img src="{{ url_for('static', filename=s.face_image_path) }}" alt="Face"
+                                    style="width:40px; height:40px; border-radius:50%; object-fit: cover; border: 2px solid var(--border);">
+                                {% else %}
+                                <div
+                                    style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg, var(--accent), #059669); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; flex-shrink:0;">
+                                    {{ s.name[0].upper() }}
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <strong style="display:block; font-size:14.5px;">{{ s.name }}</strong>
+                                    <span style="font-size:12px; color:var(--text-muted); font-family:var(--mono);">ID:
+                                        {{ s.student_id }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size:13px; color:var(--text-dim);">
+                                {{ s.email }}<br>
+                                {{ s.phone }}
+                            </div>
+                        </td>
+                        <td><span class="badge badge-gray">{{ s.course }}</span></td>
+                        <td>
+                            {% if s.has_face %}
+                            <span class="badge badge-green">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="12" height="12"
+                                    style="margin-right:2px">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                Trained Active
+                            </span>
+                            {% else %}
+                            <span class="badge badge-red">✗ Missing AI Profile</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="triggerDelete('{{ s.student_id }}')">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                    </path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="es-icon">📋</div>
+                <div class="es-text">No students enrolled yet</div>
+                <div class="es-sub">Register your first student with Face AI capture to see them dynamically generate
+                    here.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-overlay" id="addStudentModal">
+    <div class="modal" style="max-width: 800px; padding: 32px;">
+        <h3 style="margin-bottom:24px;">➕ Enroll Student & Capture AI Profile</h3>
+        <form id="addStudentForm" onsubmit="submitStudent(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+
+                
+                <div>
+                    <div class="form-group">
+                        <label>Student Full Name</label>
+                        <input type="text" id="stuName" class="form-control" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Student ID Number</label>
+                        <input type="text" id="stuID" class="form-control" required placeholder="STU-1001">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="stuEmail" class="form-control" required placeholder="john@example.com">
+                    </div>
+                    <div class="form-row" style="gap:16px;">
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="text" id="stuPhone" class="form-control" required placeholder="+123456789">
+                        </div>
+                        <div class="form-group">
+                            <label>Course Program</label>
+                            <input type="text" id="stuCourse" class="form-control" required
+                                placeholder="Computer Science">
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div>
+                    <label
+                        style="display: block; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 8px;">Face
+                        Capture</label>
+                    <div class="camera-container"
+                        style="border-radius: 12px; overflow: hidden; height: 220px; background: #000; position: relative;">
+                        <video id="studentVideo" width="100%" height="100%" style="object-fit: cover; display: none;"
+                            autoplay playsinline></video>
+                        <img id="captureResult" style="width:100%; height:100%; object-fit: cover; display:none;">
+                        <div id="cameraPlaceholder"
+                            style="position: absolute; inset:0; display:flex; align-items:center; justify-content:center; color: var(--text-muted);">
+                            Click Enable Camera
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:12px; margin-top: 16px;">
+                        <button type="button" class="btn btn-secondary btn-sm" id="btnStartCam" style="flex:1;"
+                            onclick="startRegistrationCamera()">🎥 Enable Camera</button>
+                        <button type="button" class="btn btn-sm btn-primary" id="btnCapture"
+                            style="flex:1; display:none;" onclick="capturePhoto()">📸 Capture Image</button>
+                    </div>
+                    <input type="hidden" id="finalImageBase64" required>
+
+                    <p style="color:var(--danger); font-size:13px; margin-top:16px; padding:8px; border-radius:8px; background:var(--danger-bg); display:none;"
+                        id="formError"></p>
+                </div>
+            </div>
+
+            <div
+                style="display:flex; justify-content: flex-end; gap:16px; margin-top:32px; border-top: 1px solid var(--border); padding-top: 24px;">
+                <button type="button" class="btn btn-secondary" onclick="closeAddModalSafe()">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="btnSaveStudent" disabled style="width: auto;">Verify &
+                    Add Profile</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let localStream = null;
+
+    // Safe overrides in case script.js openModal doesn't exist uniquely
+    function openAddModal() { document.getElementById('addStudentModal').classList.add('active'); }
+    function closeAddModal() { document.getElementById('addStudentModal').classList.remove('active'); }
+
+    function openAddStudentModal() {
+        document.getElementById('addStudentForm').reset();
+        document.getElementById('captureResult').style.display = 'none';
+        document.getElementById('studentVideo').style.display = 'none';
+        document.getElementById('cameraPlaceholder').style.display = 'flex';
+        document.getElementById('btnStartCam').style.display = 'block';
+        document.getElementById('btnStartCam').textContent = '🎥 Enable Camera';
+        document.getElementById('btnCapture').style.display = 'none';
+        document.getElementById('btnSaveStudent').disabled = true;
+        document.getElementById('finalImageBase64').value = '';
+        document.getElementById('formError').style.display = 'none';
+
+        // Attempt standard openModal from script.js, fallback to direct class
+        if (typeof openModal === 'function') { openModal('addStudentModal'); }
+        else { openAddModal(); }
+    }
+
+    function closeAddModalSafe() {
+        if (localStream) {
+            localStream.getTracks().forEach(t => t.stop());
+            localStream = null;
+        }
+        if (typeof closeModal === 'function') { closeModal('addStudentModal'); }
+        else { closeAddModal(); }
+    }
+
+    function startRegistrationCamera() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                localStream = stream;
+                const video = document.getElementById('studentVideo');
+                video.srcObject = stream;
+                video.style.display = 'block';
+                document.getElementById('cameraPlaceholder').style.display = 'none';
+                document.getElementById('captureResult').style.display = 'none';
+
+                document.getElementById('btnStartCam').style.display = 'none';
+                document.getElementById('btnCapture').style.display = 'block';
+                document.getElementById('formError').style.display = 'none';
+            })
+            .catch(err => {
+                document.getElementById('formError').textContent = "Camera access denied or unavailable. Please check your browser permissions.";
+                document.getElementById('formError').style.display = 'block';
+            });
+    }
+
+    function capturePhoto() {
+        const video = document.getElementById('studentVideo');
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        document.getElementById('finalImageBase64').value = dataUrl;
+
+        // Stop camera
+        if (localStream) {
+            localStream.getTracks().forEach(t => t.stop());
+            localStream = null;
+        }
+
+        video.style.display = 'none';
+        const resultImg = document.getElementById('captureResult');
+        resultImg.src = dataUrl;
+        resultImg.style.display = 'block';
+
+        document.getElementById('btnCapture').style.display = 'none';
+        document.getElementById('btnStartCam').textContent = "Retake Photo";
+        document.getElementById('btnStartCam').style.display = 'block';
+
+        document.getElementById('btnSaveStudent').disabled = false;
+    }
+
+    function submitStudent(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnSaveStudent');
+        btn.textContent = "Processing DeepFace AI...";
+        btn.disabled = true;
+
+        const errBox = document.getElementById('formError');
+        errBox.style.display = 'none';
+
+        const data = {
+            name: document.getElementById('stuName').value,
+            student_id: document.getElementById('stuID').value,
+            email: document.getElementById('stuEmail').value,
+            phone: document.getElementById('stuPhone').value,
+            course: document.getElementById('stuCourse').value,
+            image_data: document.getElementById('finalImageBase64').value
+        };
+
+        fetch('/students/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    errBox.textContent = "Error: " + data.message;
+                    errBox.style.display = 'block';
+                    btn.textContent = "Verify & Add Profile";
+                    btn.disabled = false;
+                }
+            })
+            .catch(err => {
+                errBox.textContent = "Network error. Check connection.";
+                errBox.style.display = 'block';
+                btn.textContent = "Verify & Add Profile";
+                btn.disabled = false;
+            });
+    }
+
+    function triggerDelete(sid) {
+        if (!confirm("Are you sure you want to permanently delete this student's profile and face data?")) return;
+
+        fetch('/students/delete/' + sid, {
+            method: 'POST'
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) window.location.reload();
+            });
+    }
+
+    document.getElementById('addStudentModal').addEventListener('click', function (e) {
+        if (e.target === this) { closeAddModalSafe(); }
+    });
+</script>
+{% endblock %}

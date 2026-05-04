@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — AI Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">Dashboard</div>
+    <div class="page-sub">OVERVIEW &amp; QUICK STATS</div>
+  </div>
+  <div style="display:flex; align-items:center; gap:8px; color:var(--text-muted); font-size:13px;">
+    <span class="status-dot"></span> System Online
+  </div>
+</div>
+
+<div class="page-body">
+  
+  <div class="stats-grid">
+    <div class="stat-card green">
+      <div class="stat-icon">👥</div>
+      <div class="stat-value">{{ stats.students }}</div>
+      <div class="stat-label">Total Students</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-icon">📚</div>
+      <div class="stat-value">{{ stats.courses }}</div>
+      <div class="stat-label">Courses</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value">{{ stats.today_attendance }}</div>
+      <div class="stat-label">Today's Attendance</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-icon">🧠</div>
+      <div class="stat-value">{{ stats.registered_faces }}</div>
+      <div class="stat-label">Registered Faces</div>
+    </div>
+  </div>
+
+  
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-header">
+      <div class="card-title">⚡ Quick Actions</div>
+    </div>
+    <div class="card-body">
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="/attendance" class="btn btn-primary">📷 Start Attendance Scan</a>
+        <a href="/students" class="btn btn-secondary">➕ Manage Students</a>
+        <a href="/reports" class="btn btn-secondary">📋 View Reports</a>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🔧 System Status</div>
+    </div>
+    <div class="card-body">
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px;">
+        <div style="padding:16px; background:var(--surface2); border-radius:8px; border:1px solid var(--border);">
+          <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Face Recognition</div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="status-dot"></span>
+            <span style="font-size:14px; font-weight:700; color:var(--accent);">Active</span>
+          </div>
+        </div>
+        <div style="padding:16px; background:var(--surface2); border-radius:8px; border:1px solid var(--border);">
+          <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Database</div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="status-dot"></span>
+            <span style="font-size:14px; font-weight:700; color:var(--accent);">Connected</span>
+          </div>
+        </div>
+        <div style="padding:16px; background:var(--surface2); border-radius:8px; border:1px solid var(--border);">
+          <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">OpenCV Engine</div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="status-dot"></span>
+            <span style="font-size:14px; font-weight:700; color:var(--accent);">Ready</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

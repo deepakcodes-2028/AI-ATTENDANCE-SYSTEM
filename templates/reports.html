@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Reports — AI Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">Attendance Reports</div>
+    <div class="page-sub">FILTER &amp; VIEW ATTENDANCE RECORDS</div>
+  </div>
+  <span id="reportCount" class="badge badge-blue">Loading...</span>
+</div>
+
+<div class="page-body">
+  
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-header">
+      <div class="card-title">🔍 Filter Records</div>
+    </div>
+    <div class="card-body">
+      <div class="filter-bar">
+        <div style="flex:1; min-width:160px;">
+          <label style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); display:block; margin-bottom:6px;">Date</label>
+          <input type="date" id="filterDate" class="form-control" onchange="loadReports()">
+        </div>
+        <div style="flex:1; min-width:180px;">
+          <label style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); display:block; margin-bottom:6px;">Course</label>
+          <select id="filterCourse" class="form-control form-select" onchange="loadReports()">
+            <option value="">All Courses</option>
+            {% for c in courses %}
+            <option value="{{ c.course_id }}">{{ c.course_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div style="flex:1; min-width:180px;">
+          <label style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); display:block; margin-bottom:6px;">Student Name</label>
+          <input type="text" id="filterStudent" class="form-control" placeholder="Search by name..." oninput="loadReports()">
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button class="btn btn-secondary" onclick="clearFilters()">✕ Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📋 Attendance Records</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Program</th>
+            <th>Subject</th>
+            <th>Date</th>
+            <th>Time Slot</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="reportTableBody">
+          <tr><td colspan="7">
+            <div class="empty-state">
+              <div class="es-icon">⏳</div>
+              <div class="es-text">Loading records...</div>
+            </div>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function clearFilters() {
+  document.getElementById('filterDate').value = '';
+  document.getElementById('filterCourse').value = '';
+  document.getElementById('filterStudent').value = '';
+  loadReports();
+}
+</script>
+{% endblock %}

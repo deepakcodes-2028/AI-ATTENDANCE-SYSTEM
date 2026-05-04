@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Take Attendance — AI Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">Take Attendance</div>
+    <div class="page-sub">REAL-TIME FACE RECOGNITION ATTENDANCE</div>
+  </div>
+</div>
+
+<div class="page-body">
+  <div style="display:grid; grid-template-columns:1fr 340px; gap:24px;">
+
+    
+    <div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <div class="card-title">📷 Camera Feed</div>
+          <span id="cameraStatus" style="font-size:13px; color:var(--text-muted); font-family:var(--mono);">Camera ready</span>
+        </div>
+        <div class="card-body" style="padding:16px;">
+          <div style="margin-bottom:16px;">
+            <label style="font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--accent); display:block; margin-bottom:8px;">
+              Select Course (Mandatory)
+            </label>
+            <select id="courseSelect" class="form-control form-select">
+              <option value="">— No Course Selected —</option>
+              {% for c in courses %}
+              <option value="{{ c.course_id }}">{{ c.course_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="camera-container">
+            <video id="videoFeed" autoplay muted playsinline></video>
+            <canvas id="overlayCanvas"></canvas>
+          </div>
+
+          <div class="camera-controls">
+            <button class="btn btn-secondary" onclick="startCamera()">🎥 Start Camera</button>
+            <button class="btn btn-primary" id="startRecognitionBtn" onclick="startRecognition()">
+              ▶ Start Recognition
+            </button>
+            <button class="btn btn-danger" id="stopRecognitionBtn" onclick="stopRecognition()" style="display:none;">
+              ⏹ Stop
+            </button>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📌 Instructions</div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            {% for step in [
+              ('1', 'Select a course from the dropdown (optional)'),
+              ('2', 'Click "Start Camera" to activate webcam'),
+              ('3', 'Click "Start Recognition" to begin face scanning'),
+              ('4', 'Students facing the camera will be detected automatically'),
+              ('5', 'Attendance is marked and saved every 2 seconds'),
+              ('6', 'Click "Stop" when done')
+            ] %}
+            <div style="display:flex; align-items:flex-start; gap:12px; padding:10px; background:var(--surface2); border-radius:8px;">
+              <div style="width:24px; height:24px; border-radius:50%; background:var(--accent); color:#000; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                {{ step[0] }}
+              </div>
+              <span style="font-size:13px; padding-top:3px;">{{ step[1] }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div>
+      <div class="card" style="position:sticky; top:24px;">
+        <div class="card-header">
+          <div class="card-title">✅ Recognized</div>
+          <button class="btn btn-secondary btn-sm" onclick="clearRecognized()">Clear</button>
+        </div>
+        <div class="card-body" style="padding:12px;">
+          <div id="recognizedList" class="recognized-list">
+            <div class="empty-state">
+              <div class="es-icon">👤</div>
+              <div class="es-text">No faces recognized yet</div>
+              <div class="es-sub">Start the camera to begin</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function clearRecognized() {
+  const list = document.getElementById('recognizedList');
+  list.innerHTML = `
+    <div class="empty-state">
+      <div class="es-icon">👤</div>
+      <div class="es-text">No faces recognized yet</div>
+      <div class="es-sub">Start the camera to begin</div>
+    </div>`;
+}
+
+window.addEventListener('beforeunload', () => {
+  stopCamera();
+});
+</script>
+{% endblock %}

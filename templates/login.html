@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — AI Attendance System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="login-page">
+  
+  <div class="login-form-section">
+    <div class="login-card">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 10px 30px var(--accent-glow); margin-bottom: 20px;">
+          🎓
+        </div>
+        <h2>AttendAI</h2>
+        <p class="subtitle">Secure Faculty Authentication Portal</p>
+      </div>
+
+      {% if error %}
+      <div class="error-msg">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <form method="POST" action="/">
+        <div class="form-group">
+          <label for="email">Faculty Email Address</label>
+          <input type="email" id="email" name="email" class="form-control"
+                 required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Security Password</label>
+          <input type="password" id="password" name="password" class="form-control"
+                 required autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 8px;">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+          </svg>
+          Authenticate Faculty
+        </button>
+      </form>
+
+      <div style="margin-top:40px; border-top: 1px solid var(--border); padding-top: 24px;">
+        <p style="font-size:13px; color:var(--text-dim); text-align:center; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span class="status-dot"></span> System Online 
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
